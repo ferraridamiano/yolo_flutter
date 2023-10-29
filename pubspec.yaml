@@ -1,0 +1,27 @@
+name: yolo_flutter
+description: A flutter project that uses tflite_flutter and NMS to show YOLOv8 output
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.6 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  tflite_flutter: ^0.10.3
+  image: ^4.1.3
+  image_picker: ^1.0.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/models/
