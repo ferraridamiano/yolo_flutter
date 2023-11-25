@@ -21,7 +21,7 @@ jobs:
     - name: Install yolov8 package and export the model
       run: |
         pip install ultralytics
-        python -m yolo export model=yolov8n.pt format=tflite
+        yolo export model=yolov8n.pt format=tflite
         ls
 
     - name: Setup Java
