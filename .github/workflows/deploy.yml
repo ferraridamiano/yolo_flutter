@@ -16,11 +16,11 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.9'
     
     - name: Install yolov8 package and export the model
       run: |
-        pip install tensorflow==2.13.1 ultralytics
+        pip install tensorflow-cpu==2.13.1 ultralytics
         yolo export model=yolov8n.pt format=tflite
         ls
 
