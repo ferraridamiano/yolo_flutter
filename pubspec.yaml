@@ -24,4 +24,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/models/
+    - assets/models/yolov8n.tflite

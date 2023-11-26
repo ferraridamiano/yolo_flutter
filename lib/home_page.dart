@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   );
   File? imageFile;
 
-  double confidenceThreshold = 0.6;
+  double confidenceThreshold = 0.4;
   double iouThreshold = 0.1;
 
   (List<List<double>>, double, double)? inferenceOutput;
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
     if (imageWidth != null && imageHeight != null) {
       double k1 = displayWidth / imageWidth!;
       double k2 = maxImageWidgetHeight / imageHeight!;
-      resizeFactor = min(k1, k2);
+      resizeFactor = min(k1, k2) * 640;
     }
 
     List<Bbox> bboxesWidgets = [];
