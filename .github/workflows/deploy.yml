@@ -1,0 +1,57 @@
+name: "Build & deploy"
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build_deploy:
+    name: Build and release Android APKs
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install yolov8 package and export the model
+      run: |
+        pip install tensorflow-cpu==2.13.1 protobuf==3.20.* ultralytics
+        yolo export model=yolov8n.pt format=tflite
+        mv yolov8n_saved_model/yolov8n_float32.tflite assets/models/yolov8n.tflite
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Install missing packages
+      run: |
+        sudo apt update
+        sudo apt install -y clang cmake ninja-build pkg-config libgtk-3-dev
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        cache: true
+
+    - name: Flutter version
+      run: flutter --version
+
+    - name: Build Android APK files
+      run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=/tmp
+
+    - name: Release to GitHub
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/app/outputs/flutter-apk/app-*-release.apk"
+        token: ${{ secrets.GH_TOKEN }}
+        tag: ${{ steps.version.outputs.content }}
+        commit: ${{ github.sha }}
+        allowUpdates: true     #so if you rerun a job it will overwrite the existing files
