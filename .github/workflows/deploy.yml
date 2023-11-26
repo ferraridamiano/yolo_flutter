@@ -2,13 +2,13 @@ name: "Build & deploy"
 
 on:
   push:
-    #tags: ['v*']
+    tags: ['v*']
 
 jobs:
   build_deploy:
     name: Build and release Android APKs
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -46,3 +46,12 @@ jobs:
 
     - name: Build Android APK files
       run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=/tmp
+
+    - name: Release to GitHub
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "build/app/outputs/flutter-apk/app-*-release.apk"
+        token: ${{ secrets.GH_TOKEN }}
+        tag: ${{ steps.version.outputs.content }}
+        commit: ${{ github.sha }}
+        allowUpdates: true     #so if you rerun a job it will overwrite the existing files
