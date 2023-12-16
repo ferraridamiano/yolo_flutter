@@ -12,6 +12,12 @@ and Android (although I only tested the latter).
     <img src='images/image_2.jpg' width='200'>
 </div>
 
+## Supported platforms
+Platform support depends on the [`tflite_flutter`](https://pub.dev/packages/tflite_flutter)
+package. Theoretically the app could be compiled for Android, iOS, Linux,
+Windows and MacOS. I have only tested it on Android and Linux. Please submit a
+PR if the implementation on the other OSs is broken.
+
 ## How to compile it
 - [Install flutter](https://docs.flutter.dev/get-started/install)
 - [Install the ultralytics Python package](https://docs.ultralytics.com/quickstart)
@@ -20,6 +26,9 @@ and Android (although I only tested the latter).
 - Compile the app with `flutter build apk --release`
 
 ## FAQ
+
+### Can I test the app without compiling it?
+You can find the latest version of the app for Android on the Github [release page](https://github.com/ferraridamiano/yolo_flutter/releases).
 
 ### Can I run my custom object detection model?
 Yes, place your model in the assets/models folder and change the labels inside
