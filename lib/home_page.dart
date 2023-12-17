@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   double confidenceThreshold = 0.4;
   double iouThreshold = 0.1;
 
-  (List<List<double>>, double, double)? inferenceOutput;
+  List<List<double>>? inferenceOutput;
   List<int> classes = [];
   List<List<double>> bboxes = [];
   List<double> scores = [];
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
     if (imageWidth != null && imageHeight != null) {
       double k1 = displayWidth / imageWidth!;
       double k2 = maxImageWidgetHeight / imageHeight!;
-      resizeFactor = min(k1, k2) * 640;
+      resizeFactor = min(k1, k2);
     }
 
     List<Bbox> bboxesWidgets = [];
@@ -166,9 +166,9 @@ class _HomePageState extends State<HomePage> {
     List<List<double>> newBboxes = [];
     List<double> newScores = [];
     (newClasses, newBboxes, newScores) = model.postprocess(
-      inferenceOutput!.$1,
-      inferenceOutput!.$2,
-      inferenceOutput!.$3,
+      inferenceOutput!,
+      imageWidth!,
+      imageHeight!,
       confidenceThreshold: confidenceThreshold,
       iouThreshold: iouThreshold,
     );

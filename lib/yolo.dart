@@ -21,7 +21,7 @@ class YoloModel {
     _interpreter = await Interpreter.fromAsset(modelPath);
   }
 
-  (List<List<double>>, double, double) infer(Image image) {
+  List<List<double>> infer(Image image) {
     assert(_interpreter != null, 'The model must be initialized');
 
     final imgResized = copyResize(image, width: inWidth, height: inHeight);
@@ -47,13 +47,13 @@ class YoloModel {
     _interpreter!.run([imgNormalized], output);
     debugPrint(
         'Prediction time: ${DateTime.now().millisecondsSinceEpoch - predictionTimeStart} ms');
-    return (output[0], image.width / inWidth, image.height / inHeight);
+    return output[0];
   }
 
   (List<int>, List<List<double>>, List<double>) postprocess(
     List<List<double>> unfilteredBboxes,
-    double resizeFactorX,
-    double resizeFactorY, {
+    int imageWidth,
+    int imageHeight, {
     double confidenceThreshold = 0.7,
     double iouThreshold = 0.1,
   }) {
@@ -69,10 +69,10 @@ class YoloModel {
     debugPrint(
         'NMS time: ${DateTime.now().millisecondsSinceEpoch - nmsTimeStart} ms');
     for (var bbox in bboxes) {
-      bbox[0] *= resizeFactorX;
-      bbox[1] *= resizeFactorY;
-      bbox[2] *= resizeFactorX;
-      bbox[3] *= resizeFactorY;
+      bbox[0] *= imageWidth;
+      bbox[1] *= imageHeight;
+      bbox[2] *= imageWidth;
+      bbox[3] *= imageHeight;
     }
     return (classes, bboxes, scores);
   }
@@ -81,15 +81,12 @@ class YoloModel {
     Image image, {
     double confidenceThreshold = 0.7,
     double iouThreshold = 0.1,
-  }) {
-    // please upvote https://github.com/dart-lang/language/issues/2128
-    var out = infer(image);
-    return postprocess(
-      out.$1,
-      out.$2,
-      out.$3,
-      confidenceThreshold: confidenceThreshold,
-      iouThreshold: iouThreshold,
-    );
-  }
+  }) =>
+      postprocess(
+        infer(image),
+        image.width,
+        image.height,
+        confidenceThreshold: confidenceThreshold,
+        iouThreshold: iouThreshold,
+      );
 }
