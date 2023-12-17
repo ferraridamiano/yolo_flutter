@@ -1,11 +1,9 @@
 # yolo_flutter
 
 An example project using the official [`tflite_flutter`](https://pub.dev/packages/tflite_flutter)
-package from the tensorflow team to run YOLO (a fast object detection model).
+package from the Tensorflow team to run YOLO (a fast object detection model).
 This example is complete: it embeds the non-max suppression algorithm I wrote in
-Dart. My implementation is not optimized and it takes ~70 ms on a Snapdragon 730
-just for this post-processing step. The app should be compatible with iOS, MacOS
-and Android (although I only tested the latter).
+Dart.
 
 <div align="center">
     <img src='images/image_1.jpg' width='200'>

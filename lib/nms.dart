@@ -2,8 +2,6 @@ import 'dart:math';
 
 (List<int>, List<List<double>>, List<double>) nms(List<List<double>> rawOutput,
     {double confidenceThreshold = 0.7, double iouThreshold = 0.4}) {
-  final transposedOutput = transpose(rawOutput);
-
   List<int> bestClasses = [];
   List<double> bestScores = [];
 
@@ -14,7 +12,7 @@ import 'dart:math';
     double bestScore = 0;
     int bestCls = -1;
     for (int j = 4; j < 84; j++) {
-      double clsScore = transposedOutput[i][j];
+      double clsScore = rawOutput[j][i];
       if (clsScore > bestScore) {
         bestScore = clsScore;
         bestCls = j - 4;
@@ -30,7 +28,11 @@ import 'dart:math';
   // Get rid of boxes below confidence threshold
   List<List<double>> candidateBoxes = [];
   for (var index in boxesToSave) {
-    candidateBoxes.add(transposedOutput[index]);
+    List<double> savedBox = [];
+    for (int i = 0; i < 4; i++) {
+      savedBox.add(rawOutput[i][index]);
+    }
+    candidateBoxes.add(savedBox);
   }
 
   var sortedBestScores = List.from(bestScores);
@@ -110,16 +112,4 @@ double computeIou(List<double> bbox1, List<double> bbox2) {
   double iou = intersectionArea / (bbox1Area + bbox2Area - intersectionArea);
   assert(iou >= 0 && iou <= 1);
   return iou;
-}
-
-List<List<double>> transpose(List<List<double>> list) {
-  List<List<double>> result = [];
-  for (var i = 0; i < list[0].length; i++) {
-    List<double> temp = [];
-    for (var j = 0; j < list.length; j++) {
-      temp.add(list[j][i]);
-    }
-    result.add(temp);
-  }
-  return result;
 }
