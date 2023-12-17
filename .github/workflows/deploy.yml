@@ -6,7 +6,7 @@ on:
 
 jobs:
   build_deploy:
-    name: Build and release Android APKs
+    name: Build & deploy for Android and Linux
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

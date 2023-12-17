@@ -26,7 +26,8 @@ PR if the implementation on the other OSs is broken.
 ## FAQ
 
 ### Can I test the app without compiling it?
-You can find the latest version of the app for Android on the Github [release page](https://github.com/ferraridamiano/yolo_flutter/releases).
+You can find the latest version of the app for Android and Linux on the Github
+[release page](https://github.com/ferraridamiano/yolo_flutter/releases).
 
 ### Can I run my custom object detection model?
 Yes, place your model in the assets/models folder and change the labels inside
