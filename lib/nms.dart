@@ -1,7 +1,11 @@
 import 'dart:math';
 
-(List<int>, List<List<double>>, List<double>) nms(List<List<double>> rawOutput,
-    {double confidenceThreshold = 0.7, double iouThreshold = 0.4}) {
+(List<int>, List<List<double>>, List<double>) nms(
+  List<List<double>> rawOutput, {
+  double confidenceThreshold = 0.7,
+  double iouThreshold = 0.4,
+  bool agnostic = false,
+}) {
   List<int> bestClasses = [];
   List<double> bestScores = [];
 
@@ -61,11 +65,10 @@ import 'dart:math';
 
     List<int> indexesToRemove = [];
     for (int i = 0; i < sortedCandidateBoxes.length; i++) {
-      if (class1 == sortedBestClasses[i]) {
-        if (computeIou(bbox1xyxy, xywh2xyxy(sortedCandidateBoxes[i])) >
-            iouThreshold) {
-          indexesToRemove.add(i);
-        }
+      if ((agnostic || class1 == sortedBestClasses[i]) &&
+          computeIou(bbox1xyxy, xywh2xyxy(sortedCandidateBoxes[i])) >
+              iouThreshold) {
+        indexesToRemove.add(i);
       }
     }
     for (var index in indexesToRemove.reversed) {

@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   double confidenceThreshold = 0.4;
   double iouThreshold = 0.1;
+  bool agnosticNMS = false;
 
   List<List<double>>? inferenceOutput;
   List<int> classes = [];
@@ -83,41 +84,69 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('YOLO')),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.image_outlined),
-        onPressed: () async {
-          final XFile? newImageFile =
-              await picker.pickImage(source: ImageSource.gallery);
-          if (newImageFile != null) {
-            setState(() {
-              imageFile = File(newImageFile.path);
-            });
-            final image = img.decodeImage(await newImageFile.readAsBytes())!;
-            imageWidth = image.width;
-            imageHeight = image.height;
-            inferenceOutput = model.infer(image);
-            updatePostprocess();
-          }
-        },
-      ),
       body: ListView(
         children: [
-          SizedBox(
-            height: maxImageWidgetHeight,
-            child: Center(
-              child: Stack(
-                children: [
-                  if (imageFile != null) Image.file(imageFile!),
-                  ...bboxesWidgets,
-                ],
+          InkWell(
+            onTap: () async {
+              final XFile? newImageFile =
+                  await picker.pickImage(source: ImageSource.gallery);
+              if (newImageFile != null) {
+                setState(() {
+                  imageFile = File(newImageFile.path);
+                });
+                final image =
+                    img.decodeImage(await newImageFile.readAsBytes())!;
+                imageWidth = image.width;
+                imageHeight = image.height;
+                inferenceOutput = model.infer(image);
+                updatePostprocess();
+              }
+            },
+            child: SizedBox(
+              height: maxImageWidgetHeight,
+              child: Center(
+                child: Stack(
+                  children: [
+                    if (imageFile == null)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.file_open_outlined,
+                            size: 80,
+                          ),
+                          Text(
+                            'Pick an image',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ],
+                      )
+                    else
+                      Image.file(imageFile!),
+                    ...bboxesWidgets,
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(height: 30),
-          const Center(
-            child: Text(
-              'Confidence threshold',
-              style: TextStyle(fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Text(
+                  'Confidence threshold:',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${(confidenceThreshold * 100).toStringAsFixed(0)}%',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
           Slider(
@@ -125,7 +154,6 @@ class _HomePageState extends State<HomePage> {
             min: 0,
             max: 1,
             divisions: 100,
-            label: confidenceThreshold.toStringAsFixed(2),
             onChanged: (value) {
               setState(() {
                 confidenceThreshold = value;
@@ -133,11 +161,23 @@ class _HomePageState extends State<HomePage> {
               });
             },
           ),
-          const SizedBox(height: 30),
-          const Center(
-            child: Text(
-              'IoU threshold',
-              style: TextStyle(fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Text(
+                  'IoU threshold',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${(iouThreshold * 100).toStringAsFixed(0)}%',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
           Slider(
@@ -145,10 +185,22 @@ class _HomePageState extends State<HomePage> {
             min: 0,
             max: 1,
             divisions: 100,
-            label: iouThreshold.toStringAsFixed(2),
             onChanged: (value) {
               setState(() {
                 iouThreshold = value;
+                updatePostprocess();
+              });
+            },
+          ),
+          SwitchListTile(
+            value: agnosticNMS,
+            title: Text(
+              'Agnostic NMS',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            onChanged: (value) {
+              setState(() {
+                agnosticNMS = value;
                 updatePostprocess();
               });
             },
@@ -171,6 +223,7 @@ class _HomePageState extends State<HomePage> {
       imageHeight!,
       confidenceThreshold: confidenceThreshold,
       iouThreshold: iouThreshold,
+      agnostic: agnosticNMS,
     );
     debugPrint('Detected ${bboxes.length} bboxes');
     setState(() {

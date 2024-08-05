@@ -20,7 +20,7 @@ jobs:
     
     - name: Install yolov8 package and export the model
       run: |
-        pip install tensorflow-cpu==2.13.1 protobuf==3.20.* ultralytics
+        pip install ultralytics
         yolo export model=yolov8n.pt format=tflite
         mv yolov8n_saved_model/yolov8n_float32.tflite assets/models/yolov8n.tflite
 

@@ -56,6 +56,7 @@ class YoloModel {
     int imageHeight, {
     double confidenceThreshold = 0.7,
     double iouThreshold = 0.1,
+    bool agnostic = false,
   }) {
     List<int> classes;
     List<List<double>> bboxes;
@@ -65,6 +66,7 @@ class YoloModel {
       unfilteredBboxes,
       confidenceThreshold: confidenceThreshold,
       iouThreshold: iouThreshold,
+      agnostic: agnostic,
     );
     debugPrint(
         'NMS time: ${DateTime.now().millisecondsSinceEpoch - nmsTimeStart} ms');
@@ -81,6 +83,7 @@ class YoloModel {
     Image image, {
     double confidenceThreshold = 0.7,
     double iouThreshold = 0.1,
+    bool agnostic = false,
   }) =>
       postprocess(
         infer(image),
@@ -88,5 +91,6 @@ class YoloModel {
         image.height,
         confidenceThreshold: confidenceThreshold,
         iouThreshold: iouThreshold,
+        agnostic: agnostic,
       );
 }
