@@ -58,6 +58,8 @@ class _HomePageState extends State<HomePage> {
 
     final double displayWidth = MediaQuery.of(context).size.width;
 
+    const textPadding = EdgeInsets.symmetric(horizontal: 16);
+
     double resizeFactor = 1;
 
     if (imageWidth != null && imageHeight != null) {
@@ -131,7 +133,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 30),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: textPadding,
             child: Row(
               children: [
                 Text(
@@ -149,6 +151,12 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+          const Padding(
+            padding: textPadding,
+            child: Text(
+              'If high, only the clearly recognizable objects will be detected. If low even not clear objects will be detected.',
+            ),
+          ),
           Slider(
             value: confidenceThreshold,
             min: 0,
@@ -161,8 +169,9 @@ class _HomePageState extends State<HomePage> {
               });
             },
           ),
+          const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: textPadding,
             child: Row(
               children: [
                 Text(
@@ -178,6 +187,12 @@ class _HomePageState extends State<HomePage> {
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
+            ),
+          ),
+          const Padding(
+            padding: textPadding,
+            child: Text(
+              'If high, overlapped objects will be detected. If low, only separated objects will be correctly detected.',
             ),
           ),
           Slider(
@@ -197,6 +212,11 @@ class _HomePageState extends State<HomePage> {
             title: Text(
               'Agnostic NMS',
               style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            subtitle: Text(
+              agnosticNMS
+                  ? 'Treat all the detections as the same object'
+                  : 'Detections with different labels are different objects',
             ),
             onChanged: (value) {
               setState(() {
