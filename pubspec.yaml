@@ -1,9 +1,10 @@
 name: yolo_flutter
 description: A flutter project that uses tflite_flutter and NMS to show YOLOv8 output
-version: 0.1.0+1
+version: 0.3.0+3
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
+  flutter: '>=3.22.0 <4.0.0'
 
 dependencies:
   flutter:
