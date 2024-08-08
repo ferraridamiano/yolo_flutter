@@ -234,10 +234,7 @@ class _HomePageState extends State<HomePage> {
     if (inferenceOutput == null) {
       return;
     }
-    List<int> newClasses = [];
-    List<List<double>> newBboxes = [];
-    List<double> newScores = [];
-    (newClasses, newBboxes, newScores) = model.postprocess(
+    final (newClasses, newBboxes, newScores) = model.postprocess(
       inferenceOutput!,
       imageWidth!,
       imageHeight!,
