@@ -242,7 +242,7 @@ class _HomePageState extends State<HomePage> {
       iouThreshold: iouThreshold,
       agnostic: agnosticNMS,
     );
-    debugPrint('Detected ${bboxes.length} bboxes');
+    debugPrint('Detected ${newBboxes.length} bboxes');
     setState(() {
       classes = newClasses;
       bboxes = newBboxes;
