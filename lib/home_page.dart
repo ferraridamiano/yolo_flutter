@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   static const double maxImageWidgetHeight = 400;
 
   final YoloModel model = YoloModel(
-    'assets/models/yolov8n.tflite',
+    'assets/models/yolov11n.tflite',
     inModelWidth,
     inModelHeight,
     numClasses,

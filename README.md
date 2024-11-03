@@ -34,7 +34,7 @@ Yes, place your model in the assets/models folder and change the labels inside
 the `lib/labels.dart` file.
 
 ### Does it work with all the versions of YOLO?
-I tested it only with YOLOv8 but you could try and let me know. The most 
-important thing is to make sure that the output format of the neural network
-is the same as YOLOv8.
+I tested it only with YOLOv8 and YOLOv11 but you could try and let me know. The
+most important thing is to make sure that the output format of the neural
+network is the same as YOLOv8/v11.
 
