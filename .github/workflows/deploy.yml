@@ -20,7 +20,7 @@ jobs:
     
     - name: Install yolov8 package and export the model
       run: |
-        pip install ultralytics
+        pip install ultralytics tensorflow
         yolo export model=yolo11n.pt format=tflite
         mv yolo11n_saved_model/yolo11n_float32.tflite assets/models/yolov11n.tflite
 
