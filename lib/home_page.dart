@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final bboxesColors = List<Color>.generate(
       numClasses,
-      (_) => Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0),
+      (_) => Color((Random().nextDouble() * 0xFFFFFF).toInt()).withAlpha(255),
     );
 
     final ImagePicker picker = ImagePicker();
