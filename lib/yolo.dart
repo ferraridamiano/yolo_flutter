@@ -25,16 +25,17 @@ class YoloModel {
     assert(_interpreter != null, 'The model must be initialized');
 
     final imgResized = copyResize(image, width: inWidth, height: inHeight);
-    final imgNormalized = List.generate(
-      inHeight,
-      (y) => List.generate(
-        inWidth,
-        (x) {
-          final pixel = imgResized.getPixel(x, y);
-          return [pixel.rNormalized, pixel.gNormalized, pixel.bNormalized];
-        },
-      ),
-    );
+    final Float32List floatData = Float32List(inHeight * inWidth * 3);
+    int floatIndex = 0;
+    for (int y = 0; y < inHeight; y++) {
+      for (int x = 0; x < inWidth; x++) {
+        final pixel = imgResized.getPixel(x, y);
+        floatData[floatIndex++] = pixel.rNormalized.toDouble();
+        floatData[floatIndex++] = pixel.gNormalized.toDouble();
+        floatData[floatIndex++] = pixel.bNormalized.toDouble();
+      }
+    }
+    final Uint8List imgUint8 = Uint8List.view(floatData.buffer);
 
     // output shape:
     // 1 : batch size
@@ -44,7 +45,7 @@ class YoloModel {
       List<List<double>>.filled(4 + numClasses, List<double>.filled(8400, 0))
     ];
     int predictionTimeStart = DateTime.now().millisecondsSinceEpoch;
-    _interpreter!.run([imgNormalized], output);
+    _interpreter!.run(imgUint8, output);
     debugPrint(
         'Prediction time: ${DateTime.now().millisecondsSinceEpoch - predictionTimeStart} ms');
     return output[0];
