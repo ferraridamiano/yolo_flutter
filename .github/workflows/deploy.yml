@@ -48,7 +48,8 @@ jobs:
         cache: true
 
     - name: Build Android
-      run: flutter build apk --release --split-per-abi --obfuscate
+      run: flutter build apk --release --split-per-abi
+
     - name: Build Linux
       run: |
         sudo apt update
