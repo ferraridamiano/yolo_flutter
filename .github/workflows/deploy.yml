@@ -4,23 +4,35 @@ on:
   push:
     tags: ['v*']
 
+permissions:
+  contents: write
+
 jobs:
   build_deploy:
     name: Build & deploy for Android and Linux
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
     - name: Checkout
       uses: actions/checkout@v6
+
+    - name: Free Disk Space
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        # We keep the Android SDK but remove extra tools if necessary
+        # sudo rm -rf /usr/local/lib/android 
 
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: '3.12'
+        cache: 'pip'
     
-    - name: Install yolov8 package and export the model
+    - name: Install yolov11 and export the model
       run: |
-        pip install ultralytics tensorflow
+        pip install ultralytics tensorflow-cpu
         yolo export model=yolo11n.pt format=tflite
         mv yolo11n_saved_model/yolo11n_float32.tflite assets/models/yolov11n.tflite
 
@@ -30,28 +42,19 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install missing packages
-      run: |
-        sudo apt update
-        sudo apt install -y clang cmake ninja-build pkg-config libgtk-3-dev
-
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
         channel: stable
         cache: true
 
-    - name: Flutter version
-      run: flutter --version
-
-    - name: Enable native assets
-      run: flutter config --enable-native-assets
-
-    - name: Build Android APK files
-      run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=/tmp
-
-    - name: Build for linux
-      run: flutter build linux
+    - name: Build Android
+      run: flutter build apk --release --split-per-abi --obfuscate
+    - name: Build Linux
+      run: |
+        sudo apt update
+        sudo apt install -y clang cmake ninja-build pkg-config libgtk-3-dev
+        flutter build linux --release
 
     - name: Tar linux package
       run: tar -C build/linux/x64/release/bundle -czf yolo_flutter-linux-x64.tar.gz .
@@ -59,8 +62,8 @@ jobs:
     - name: Release to GitHub
       uses: ncipollo/release-action@v1
       with:
+        # We point to the APKs we copied to the root to avoid path issues
         artifacts: "build/app/outputs/flutter-apk/app-*-release.apk,yolo_flutter-linux-x64.tar.gz"
-        token: ${{ secrets.GH_TOKEN }}
-        tag: ${{ steps.version.outputs.content }}
-        commit: ${{ github.sha }}
-        allowUpdates: true     #so if you rerun a job it will overwrite the existing files
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ github.ref_name }}
+        allowUpdates: true
