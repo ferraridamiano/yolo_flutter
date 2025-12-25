@@ -8,8 +8,8 @@ permissions:
   contents: write
 
 jobs:
-  build_deploy:
-    name: Build & deploy for Android and Linux
+  export_model:
+    name: Export Model
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -21,8 +21,6 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
         sudo rm -rf "/usr/local/share/boost"
-        # We keep the Android SDK but remove extra tools if necessary
-        # sudo rm -rf /usr/local/lib/android 
 
     - name: Setup Python
       uses: actions/setup-python@v6
@@ -34,6 +32,27 @@ jobs:
         pip install ultralytics tensorflow-cpu
         yolo export model=yolo11n.pt format=tflite
         mv yolo11n_saved_model/yolo11n_float32.tflite assets/models/yolov11n.tflite
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v6
+      with:
+        name: tflite-model
+        path: assets/models/yolov11n.tflite
+
+  build_deploy:
+    name: Build & deploy for Android and Linux
+    needs: export_model
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Download artifact
+      uses: actions/download-artifact@v7
+      with:
+        name: tflite-model
+        path: assets/models/
 
     - name: Setup Java
       uses: actions/setup-java@v5
@@ -47,8 +66,11 @@ jobs:
         channel: stable
         cache: true
 
+    - name: Enable native assets
+      run: flutter config --enable-native-assets
+
     - name: Build Android
-      run: flutter build apk --release --split-per-abi
+      run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=/tmp
 
     - name: Build Linux
       run: |
@@ -62,7 +84,6 @@ jobs:
     - name: Release to GitHub
       uses: ncipollo/release-action@v1
       with:
-        # We point to the APKs we copied to the root to avoid path issues
         artifacts: "build/app/outputs/flutter-apk/app-*-release.apk,yolo_flutter-linux-x64.tar.gz"
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ github.ref_name }}
