@@ -49,11 +49,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final bboxesColors = List<Color>.generate(
-      numClasses,
-      (_) => Color((Random().nextDouble() * 0xFFFFFF).toInt()).withAlpha(255),
-    );
-
     final ImagePicker picker = ImagePicker();
 
     final double displayWidth = MediaQuery.of(context).size.width;
@@ -72,15 +67,17 @@ class _HomePageState extends State<HomePage> {
     for (int i = 0; i < bboxes.length; i++) {
       final box = bboxes[i];
       final boxClass = classes[i];
+      final label = labels[boxClass];
       bboxesWidgets.add(
         Bbox(
-            box[0] * resizeFactor,
-            box[1] * resizeFactor,
-            box[2] * resizeFactor,
-            box[3] * resizeFactor,
-            labels[boxClass],
-            scores[i],
-            bboxesColors[boxClass]),
+          box[0] * resizeFactor,
+          box[1] * resizeFactor,
+          box[2] * resizeFactor,
+          box[3] * resizeFactor,
+          label.$1,
+          scores[i],
+          label.$2,
+        ),
       );
     }
 
