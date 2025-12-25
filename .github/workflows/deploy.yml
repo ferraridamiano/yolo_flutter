@@ -44,6 +44,9 @@ jobs:
     - name: Flutter version
       run: flutter --version
 
+    - name: Enable native assets
+      run: flutter config --enable-native-assets
+
     - name: Build Android APK files
       run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=/tmp
 

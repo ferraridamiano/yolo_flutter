@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:dartcv4/dartcv.dart' as cv;
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:yolo_flutter/bbox.dart';
 import 'package:yolo_flutter/labels.dart';
@@ -96,11 +96,11 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   imageFile = File(newImageFile.path);
                 });
-                final image =
-                    img.decodeImage(await newImageFile.readAsBytes())!;
-                imageWidth = image.width;
-                imageHeight = image.height;
+                final image = cv.imread(newImageFile.path);
+                imageWidth = image.cols;
+                imageHeight = image.rows;
                 inferenceOutput = model.infer(image);
+                image.dispose();
                 updatePostprocess();
               }
             },

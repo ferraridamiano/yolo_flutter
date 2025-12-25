@@ -11,13 +11,26 @@ dependencies:
     sdk: flutter
 
   tflite_flutter: ^0.12.1
-  image: ^4.7.2
   image_picker: ^1.2.1
+  dartcv4: ^2.1.0+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+hooks:
+  user_defines:
+    dartcv4:
+      include_modules:
+        - imgcodecs
+        - imgproc
+      exclude_modules:
+        - calib3d
+        - features2d
+        - objdetect
+        - photo
+        - stitching
 
 flutter:
   uses-material-design: true

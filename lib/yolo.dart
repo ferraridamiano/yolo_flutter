@@ -1,6 +1,6 @@
+import 'package:dartcv4/dartcv.dart' as cv;
 import 'package:flutter/foundation.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:image/image.dart';
 import 'package:yolo_flutter/nms.dart';
 
 class YoloModel {
@@ -21,20 +21,18 @@ class YoloModel {
     _interpreter = await Interpreter.fromAsset(modelPath);
   }
 
-  List<List<double>> infer(Image image) {
+  List<List<double>> infer(cv.Mat image) {
     assert(_interpreter != null, 'The model must be initialized');
 
-    final imgResized = copyResize(image, width: inWidth, height: inHeight);
-    final Float32List floatData = Float32List(inHeight * inWidth * 3);
-    int floatIndex = 0;
-    for (int y = 0; y < inHeight; y++) {
-      for (int x = 0; x < inWidth; x++) {
-        final pixel = imgResized.getPixel(x, y);
-        floatData[floatIndex++] = pixel.rNormalized.toDouble();
-        floatData[floatIndex++] = pixel.gNormalized.toDouble();
-        floatData[floatIndex++] = pixel.bNormalized.toDouble();
-      }
-    }
+    final imgResized = cv.resize(image, (inWidth, inHeight));
+    final imgRGB = cv.cvtColor(imgResized, cv.COLOR_BGR2RGB);
+
+    // Normalize to 0-1 and convert to Float32
+    final imgFloat = imgRGB.convertTo(cv.MatType.CV_32FC3, alpha: 1.0 / 255.0);
+
+    // Get data
+    final dataBytes = imgFloat.data;
+    final Float32List floatData = Float32List.view(dataBytes.buffer);
     final Uint8List imgUint8 = Uint8List.view(floatData.buffer);
 
     // output shape:
@@ -48,6 +46,12 @@ class YoloModel {
     _interpreter!.run(imgUint8, output);
     debugPrint(
         'Prediction time: ${DateTime.now().millisecondsSinceEpoch - predictionTimeStart} ms');
+
+    // Dispose
+    imgResized.dispose();
+    imgRGB.dispose();
+    imgFloat.dispose();
+
     return output[0];
   }
 
@@ -81,15 +85,15 @@ class YoloModel {
   }
 
   (List<int>, List<List<double>>, List<double>) inferAndPostprocess(
-    Image image, {
+    cv.Mat image, {
     double confidenceThreshold = 0.7,
     double iouThreshold = 0.1,
     bool agnostic = false,
   }) =>
       postprocess(
         infer(image),
-        image.width,
-        image.height,
+        image.cols,
+        image.rows,
         confidenceThreshold: confidenceThreshold,
         iouThreshold: iouThreshold,
         agnostic: agnostic,
