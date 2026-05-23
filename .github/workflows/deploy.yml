@@ -34,7 +34,7 @@ jobs:
         mv yolo11n_saved_model/yolo11n_float32.tflite assets/models/yolov11n.tflite
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: tflite-model
         path: assets/models/yolov11n.tflite
